@@ -32,16 +32,16 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-//string StrConnection = "server=localhost;user=root;database=twenti;port=3306;password=";
-//MySqlConnection connection = new MySqlConnection(StrConnection);
-//try
-//{
-//    connection.Open();
-//    if (connection.State == ConnectionState.Open)
-//        Console.WriteLine("Connection opened successfully!");
-//}
-//catch
-//{
-//    Console.WriteLine("have error");
-//}
+string StrConnection = "server=localhost;user=root;database=db_twenti;port=3306;password=";
+MySqlConnection connection = new MySqlConnection(StrConnection);
+try
+{
+    connection.Open();
+    if (connection.State == ConnectionState.Open)
+        Console.WriteLine("Connection opened successfully!");
+}
+catch
+{
+    Console.WriteLine("have error");
+}
 app.Run();

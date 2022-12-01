@@ -16,3 +16,5 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
         
     }
 }
+
+
