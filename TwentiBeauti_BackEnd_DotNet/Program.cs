@@ -6,6 +6,21 @@ using TwentiBeauti_BackEnd_DotNet.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+
+            //you can configure your custom policy
+            builder.AllowAnyOrigin()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
+
 
 // Add services to the container.
 
@@ -26,6 +41,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors();
 
 app.UseHttpsRedirection();
 

@@ -13,6 +13,6 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
         public string? Email { get; set; }
         public bool IsDeleted { get; set; }
        
-        public string? UID { get; set; }
+        //public string? UID { get; set; }
     }
 }
