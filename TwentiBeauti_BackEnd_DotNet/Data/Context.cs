@@ -8,6 +8,17 @@ namespace TwentiBeauti_BackEnd_DotNet.Data
     public class Context : DbContext
 
     {
+        public string ConnectionString { get; set; }//biết thành viên 
+
+        public Context(string connectionString) //phuong thuc khoi tao
+        {
+            this.ConnectionString = connectionString;
+        }
+
+        private MySqlConnection GetConnection() //lấy connection 
+        {
+            return new MySqlConnection(ConnectionString);
+        }
         public Context(DbContextOptions options) : base(options)
         {
         }
@@ -17,5 +28,9 @@ namespace TwentiBeauti_BackEnd_DotNet.Data
         public DbSet<Address> Address { get; set; }
         public DbSet<Coupon> Coupon { get; set; }
         public DbSet<InvoiceDetail> InvoiceDetail { get; set; }
+        public DbSet<Invoice> Invoice { get; set; }
+
+
     }
+
 }
