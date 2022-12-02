@@ -8,6 +8,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Data
     public class Context : DbContext
 
     {
+        internal static object dbContext;
+
         public string ConnectionString { get; set; }//biết thành viên 
 
         public Context(string connectionString) //phuong thuc khoi tao

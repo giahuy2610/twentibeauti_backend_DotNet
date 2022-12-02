@@ -41,7 +41,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         {
             var address = new Address()
             {
-                IDAddress = addAddressRequest.IDAddress,
+                //IDAddress = addAddressRequest.IDAddress,
                 City = addAddressRequest.City,
                 LastName = addAddressRequest.LastName,
                 FirstName = addAddressRequest.FirstName,

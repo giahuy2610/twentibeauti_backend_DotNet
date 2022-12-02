@@ -5,7 +5,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
     public class Invoice
     {
         [Key]
-        public int IDInvoicec { get; set; }
+        public int IDInvoice { get; set; }
         public int IDTracking { get; set; }
         public int IDAddress { get; set; }
 
