@@ -6,6 +6,21 @@ using TwentiBeauti_BackEnd_DotNet.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+
+            //you can configure your custom policy
+            builder.AllowAnyOrigin()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
+
 
 // Add services to the container.
 
@@ -27,21 +42,23 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
-//string StrConnection = "server=localhost;user=root;database=twenti;port=3306;password=";
-//MySqlConnection connection = new MySqlConnection(StrConnection);
-//try
-//{
-//    connection.Open();
-//    if (connection.State == ConnectionState.Open)
-//        Console.WriteLine("Connection opened successfully!");
-//}
-//catch
-//{
-//    Console.WriteLine("have error");
-//}
+string StrConnection = "server=26.54.3.122;user=root;database=twenti;port=3306;password=";
+MySqlConnection connection = new MySqlConnection(StrConnection);
+try
+{
+    connection.Open();
+    if (connection.State == ConnectionState.Open)
+        Console.WriteLine("Connection opened successfully!");
+}
+catch
+{
+    Console.WriteLine("have error");
+}
 app.Run();

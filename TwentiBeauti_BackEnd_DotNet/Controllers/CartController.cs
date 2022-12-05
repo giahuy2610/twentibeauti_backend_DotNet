@@ -7,7 +7,7 @@ using TwentiBeauti_BackEnd_DotNet.Models;
 namespace TwentiBeauti_BackEnd_DotNet.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/cart/")]
 
     public class CartController : ControllerBase
     {
@@ -17,17 +17,22 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             this.dbContextCart = dbContextCart;
         }
 
+
         //public CustomerContext DbContext { get; set; }
 
         [HttpGet("get")]
         public async Task<IActionResult> GetCart()
         {
-            return Ok(await dbContextCart.Cart.ToListAsync());
+            var list = from cart in await dbContextCart.Cart.ToListAsync() select cart;
+            return Ok(list);
+        }
 
+
+
+
+            //public IActionResult getproduct()
+            //{
+            //    return Ok();
+            //}
         }
-        public IActionResult getproduct()
-        {
-            return Ok();
-        }
-    }
 }
