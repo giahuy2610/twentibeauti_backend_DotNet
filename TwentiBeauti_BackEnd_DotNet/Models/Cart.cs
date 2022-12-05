@@ -10,8 +10,15 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
         public int IDProduct { get; set; }
         public int? Quantity { get; set; }
 
-        
+
     }
+
+
+
+    public class product { 
+    
+    }
+
 }
 
 

@@ -30,6 +30,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Data
         public DbSet<InvoiceDetail> InvoiceDetail { get; set; }
         public DbSet<Invoice> Invoice { get; set; }
 
+        public DbSet<Collection> Collection { get; set; }
+
 
     }
 

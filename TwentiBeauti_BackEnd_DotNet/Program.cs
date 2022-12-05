@@ -49,7 +49,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-string StrConnection = "server=localhost;user=root;database=db_twenti;port=3306;password=";
+string StrConnection = "server=26.54.3.122;user=root;database=twenti;port=3306;password=";
 MySqlConnection connection = new MySqlConnection(StrConnection);
 try
 {
