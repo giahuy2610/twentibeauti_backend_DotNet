@@ -1,13 +1,16 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 using TwentiBeauti_BackEnd_DotNet.Data;
 using TwentiBeauti_BackEnd_DotNet.Models;
+using System.Dynamic;
 
 namespace TwentiBeauti_BackEnd_DotNet.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/collection")]
 
     public class CollectionController : ControllerBase
     {
@@ -16,6 +19,17 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         {
             this.dbContext = dbContext;
         }
+
+
+        [HttpGet("test")]
+        public IActionResult GetNewtonsoftJson() =>
+            BadRequest(            new JsonResult(new
+            {
+                x = "hello",
+                y = "world"
+            }));
+
+
 
         //public CollectionController DbContext { get; set; }
 
@@ -35,7 +49,19 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             {
                 return NotFound();
             }
-            return Ok(collection);
+            var json = JsonConvert.SerializeObject(collection);
+            dynamic a = JsonConvert.DeserializeObject(json, typeof(ExpandoObject));
+            var productsInCol = dbContext.CollectionProduct.Where(c => c.IDCollection == IDCollection);
+            List<Object> products = new List<Object>();
+            foreach (var product in productsInCol)
+            {
+
+
+            }
+            a.Products = products;
+
+
+            return Ok(a);
         }
 
         [HttpPost("create")]
@@ -47,14 +73,14 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 NameCollection = addCollectionRequest.NameCollection,
                 RoutePath = addCollectionRequest.RoutePath,
                 CreatedOn = addCollectionRequest.CreatedOn,
-                Description=addCollectionRequest.Description,
-                LogoImagePath=addCollectionRequest.LogoImagePath,
-                WallPaperPath=addCollectionRequest.WallPaperPath,
-                StartOn=addCollectionRequest.StartOn,
-                EndOn=addCollectionRequest.EndOn,
-                CoverImagePath=addCollectionRequest.CoverImagePath,
-                
-              
+                Description = addCollectionRequest.Description,
+                LogoImagePath = addCollectionRequest.LogoImagePath,
+                WallPaperPath = addCollectionRequest.WallPaperPath,
+                StartOn = addCollectionRequest.StartOn,
+                EndOn = addCollectionRequest.EndOn,
+                CoverImagePath = addCollectionRequest.CoverImagePath,
+
+
             };
             await dbContext.Collection.AddAsync(collection);
             await dbContext.SaveChangesAsync();
@@ -70,14 +96,14 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             if (collection != null)
             {
 
-               
+
 
                 collection.NameCollection = updateCollectionRequest.NameCollection;
-             
+
                 collection.Description = updateCollectionRequest.Description;
                 collection.LogoImagePath = updateCollectionRequest.LogoImagePath;
                 collection.WallPaperPath = updateCollectionRequest.WallPaperPath;
-                
+
                 collection.CoverImagePath = updateCollectionRequest.CoverImagePath;
 
 

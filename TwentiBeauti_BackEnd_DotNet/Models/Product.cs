@@ -17,6 +17,19 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
         public string UnitsOfMass { get; set; }
         public string Units { get; set; }
         public int ApplyTaxes { get; set; }
-        //public int
-    }
+        public int IDTag { get; set; }
+        public int IDType { get; set; }
+        public int ListPrice { get; set; }
+
+        public static void getProductDetailByID(int IDProduct)
+        {
+            //get product
+            //get the product current retail price
+            //get the product brand
+            //get the product images
+            //get the product avg rating
+            //get the product reviews
+            }
+        }
+    
 }

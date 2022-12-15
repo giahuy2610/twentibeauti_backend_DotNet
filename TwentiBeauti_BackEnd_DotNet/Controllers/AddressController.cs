@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TwentiBeauti_BackEnd_DotNet.Data;
@@ -22,7 +21,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetAddress()
         {
-            return Ok(await dbContextAddress.Address.ToListAsync());
+            return (new JsonResult(await dbContextAddress.Address.ToListAsync()));
 
         }
         [HttpGet]

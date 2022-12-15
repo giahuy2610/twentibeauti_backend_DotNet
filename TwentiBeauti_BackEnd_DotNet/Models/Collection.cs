@@ -6,17 +6,12 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
 {
     public class Collection
     {
-        
- 
-
- 
-
         [Key]
-        public int IDCollection { get; set; }
+        public int? IDCollection { get; set; }
         public string NameCollection { get; set; }
-        public string RoutePath { get; set; }
+        public string? RoutePath { get; set; }
 
-        public DateTime CreatedOn { get; set; }
+        public DateTime? CreatedOn { get; set; }
 
         public string? Description { get; set; }
 

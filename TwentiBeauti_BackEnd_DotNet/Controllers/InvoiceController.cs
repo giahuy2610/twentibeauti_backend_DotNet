@@ -30,19 +30,26 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             var invoiceOfCus = dbContextInvoice.Invoice.Where(
                 row => row.IDCus == IDCus
                 ).ToList();
+            
+            List<InvoiceInfo>? listOfInvoice = new List<InvoiceInfo> { };
 
-               
+            foreach (var invoice in invoiceOfCus)
+            {
+                var invoiceDetail = dbContextInvoice.InvoiceDetail.Where(
+                row => row.IDInvoice == invoice.IDInvoice
+                ).ToList();
 
-            //var invoiceOfCus = await dbContextInvoice.Invoice.FindAsync(IDCus);
-            //var addressOfCus = await dbContextInvoice.Address.FindAsync(invoiceOfCus.IDAddress);
+                var address = dbContextInvoice.Address.Find(invoice.IDAddress);
 
-            //var infoAddress = await Context.dbContextAddress..FindAsync(IDCus);
-//
-            //TypeDescriptor.AddAttributes(invoiceOfCus,addressOfCus);
-            //return Ok(invoiceOfCus);
-           // addressOfCus
-            return Ok(invoiceOfCus);
+                listOfInvoice.Add(new InvoiceInfo(invoice, address));
+            }
+            return Ok(listOfInvoice);
         }
+
+
+
+
+
 
     }
 
