@@ -27,6 +27,9 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             return Ok(list);
         }
 
+
+
+
             //public IActionResult getproduct()
             //{
             //    return Ok();
