@@ -48,7 +48,20 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
 
 
 
+        [HttpGet("vnpay-return")]
+        public async Task<IActionResult> PaymentCallback()
+        {
+            if (Request.Query["vnp_ResponseCode"][0] == "00")
+            {
+                //check if paid => update invoice ispaid column to true 
+                var invoice = dbContextInvoice.Invoice.Find(Request.Query["vnp_TxnRef"][0]);
+                invoice.IsPaid = true;
+                dbContextInvoice.SaveChanges();
+                return Ok();
+            }
 
+            return Ok(Request.Query["vnp_ResponseCode"][0]);
+        }
 
 
     }

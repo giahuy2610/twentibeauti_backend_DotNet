@@ -8,7 +8,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
     [Route("api/")]
     public class VNPayController : Controller
     {
-        private readonly IVnPayService _vnPayService;
+        public readonly IVnPayService _vnPayService;
 
         public VNPayController(IVnPayService vnPayService)
         {
@@ -29,13 +29,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
 
             return Redirect(url);
         }
-        [HttpGet("vnpay-return")]
-        public IActionResult PaymentCallback()
-        {
-            var response = _vnPayService.PaymentExecute(Request.Query);
 
-            return Json(response);
-        }
 
     }
 }
