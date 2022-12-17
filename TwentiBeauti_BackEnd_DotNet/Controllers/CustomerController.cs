@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using TwentiBeauti_BackEnd_DotNet.Data;
 using TwentiBeauti_BackEnd_DotNet.Models;
 
@@ -22,7 +23,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetCustomers()
         {
-            return Ok(await dbContext.Customer.ToListAsync());
+            return new OkObjectResult(JsonSerializer.Serialize(await dbContext.Customer.ToListAsync()));
 
         }
 
@@ -31,11 +32,12 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         public async Task<IActionResult> GetCustomer([FromRoute] int IDCus)
         {
             var cus = await dbContext.Customer.FindAsync(IDCus);
+            String jsonString = JsonSerializer.Serialize(cus);
             if (cus == null)
             {
                 return NotFound();
             }
-            return Ok(cus);
+            return new OkObjectResult(jsonString);
         }
 
         [HttpPost("create")]

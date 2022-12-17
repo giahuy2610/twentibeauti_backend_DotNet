@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using TwentiBeauti_BackEnd_DotNet.Data;
 using TwentiBeauti_BackEnd_DotNet.Models;
 namespace TwentiBeauti_BackEnd_DotNet.Controllers
@@ -21,19 +22,27 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetAddress()
         {
-            return (new JsonResult(await dbContextAddress.Address.ToListAsync()));
+            
+           return new OkObjectResult(JsonSerializer.Serialize(await dbContextAddress.Address.ToListAsync()));
+
+
 
         }
+
+       
+
         [HttpGet]
         [Route("get/{IDAddress:int}")]
         public async Task<IActionResult> GetAddress([FromRoute] int IDAddress)
         {
+           
             var cus = await dbContextAddress.Address.FindAsync(IDAddress);
+            String jsonString = JsonSerializer.Serialize(cus);
             if (cus == null)
             {
                 return NotFound();
             }
-            return Ok(cus);
+            return new OkObjectResult(jsonString);
         }
         [HttpPost("create")]
         public async Task<IActionResult> AddAddress(Address addAddressRequest)
@@ -53,7 +62,12 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             };
             await dbContextAddress.Address.AddAsync(address);
             await dbContextAddress.SaveChangesAsync();
-            return Ok(address);
+            return JsonResult(address);
+        }
+
+        private IActionResult JsonResult(Address address)
+        {
+            throw new NotImplementedException();
         }
     }
 }

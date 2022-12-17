@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using TwentiBeauti_BackEnd_DotNet.Data;
 using TwentiBeauti_BackEnd_DotNet.Models;
 
@@ -24,7 +25,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         public async Task<IActionResult> GetCart()
         {
             var list = from cart in await dbContextCart.Cart.ToListAsync() select cart;
-            return Ok(list);
+            String jsonString = JsonSerializer.Serialize(list);
+            return Ok(jsonString);
         }
 
 
