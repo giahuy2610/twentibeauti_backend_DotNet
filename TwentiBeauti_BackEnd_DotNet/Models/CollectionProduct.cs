@@ -6,10 +6,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
 {
     public class CollectionProduct
     {
-        [Key]
-
-        public int IDCollection { get; set; }
-
-        public int IDProduct { get; set; }
+        public int? IDCollection { get; set; }
+        public int? IDProduct { get; set; }
     }
 }

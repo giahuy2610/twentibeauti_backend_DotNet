@@ -15,8 +15,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet("show-current/{IDProduct:int}")]
-        public int showCurrent(int IDProduct)
+        [HttpGet("show-current/{IDProduct:int}")] // done
+        public int showCurrent(int? IDProduct)
         {
             var retailPrice = dbContext.RetailPrice.Where(r => r.IDProduct == IDProduct && r.StartOn <= DateTime.Now && r.EndOn >= DateTime.Now).OrderBy(r => r.CreatedOn);
             return !retailPrice.Any() ? dbContext.Product.Find(IDProduct).ListPrice : retailPrice.Last().Price;

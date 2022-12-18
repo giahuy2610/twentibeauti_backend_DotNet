@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Org.BouncyCastle.Pkcs;
 using TwentiBeauti_BackEnd_DotNet.Data;
 using TwentiBeauti_BackEnd_DotNet.Models;
@@ -18,42 +19,33 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             this.dbContextCoupon = dbContextCoupon;
         }
 
-        [HttpGet("index")]
+        [HttpGet("index")] //done
         public async Task<IActionResult> index()
         {
-            return (new JsonResult(await dbContextCoupon.Coupon.ToListAsync()));
+            return Ok(JsonConvert.SerializeObject(await dbContextCoupon.Coupon.ToListAsync()));
         }
 
-        [HttpGet("available")]
+        [HttpGet("available")] // done
         public async Task<IActionResult> indexAvailable()
         {
-            return (Ok(await dbContextCoupon.Coupon.Where(c => c.StartOn <= DateTime.Now && c.EndOn >= DateTime.Now && c.Stock > 0 && c.IsDeleted == false).ToListAsync()));
+            return Ok(JsonConvert.SerializeObject(await dbContextCoupon.Coupon.Where(c => c.StartOn <= DateTime.Now && c.EndOn >= DateTime.Now && c.Stock > 0 && c.IsDeleted == false).ToListAsync()));
         }
 
-        [HttpGet("show/{IDCoupon:int}")]
+        [HttpGet("show/{IDCoupon:int}")] // done
         public async Task<IActionResult> show(int IDCoupon)
         {
-            return Ok(await dbContextCoupon.Coupon.FindAsync(IDCoupon));
+            return Ok(JsonConvert.SerializeObject(await dbContextCoupon.Coupon.FindAsync(IDCoupon)));
         }
 
-        [HttpGet("check-available/{IDCoupon:int}")]
-        public async Task<IActionResult> checkAvailable(int IDCoupon)
+        [HttpGet("check-available/{CodeCoupon}")] // done
+        public async Task<IActionResult> checkAvailable(String CodeCoupon)
         {
-            var c = await dbContextCoupon.Coupon.FindAsync(IDCoupon);
+            var c = dbContextCoupon.Coupon.Where(coupon => coupon.CodeCoupon == CodeCoupon).First();
             if (c == null) return NotFound();
             else if (c.StartOn <= DateTime.Now && c.EndOn >= DateTime.Now && c.Stock > 0 && c.IsDeleted == false)
-            return Ok(c);
+            return Ok(JsonConvert.SerializeObject(c));
             else return BadRequest();
         }
-
-        [HttpPost]
-        [Route("post/{CodeCoupon}")]
-        public async Task<IActionResult> GetCoupon([FromRoute] string CodeCoupon)
-        {
-
-            return Ok(this.dbContextCoupon.Coupon.Where(coupon => coupon.CodeCoupon == CodeCoupon).First().IDCoupon);
-        }
-
     }
 
 }

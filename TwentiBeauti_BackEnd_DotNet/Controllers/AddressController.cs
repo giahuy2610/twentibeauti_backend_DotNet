@@ -22,8 +22,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         public async Task<IActionResult> GetAddress()
         {
             return (new JsonResult(await dbContextAddress.Address.ToListAsync()));
-
         }
+
         [HttpGet]
         [Route("get/{IDAddress:int}")]
         public async Task<IActionResult> GetAddress([FromRoute] int IDAddress)

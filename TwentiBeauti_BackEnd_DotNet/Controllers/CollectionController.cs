@@ -40,51 +40,70 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
 
         }
 
-        [HttpGet]
-        [Route("show/{IDCollection:int}")]
-        public async Task<IActionResult> GetCollection([FromRoute] int IDCollection)
+        [HttpGet]//done
+        [Route("show/{IDCollection:int?}")]
+        public async Task<IActionResult> GetCollection(int IDCollection=0)
         {
-            var collection = await dbContext.Collection.FindAsync(IDCollection);
+            if (IDCollection == 0) return Ok(JsonConvert.SerializeObject(dbContext.Collection.ToList()));
+            var collection = dbContext.Collection.Find(IDCollection);
             if (collection == null)
             {
                 return NotFound();
             }
             var json = JsonConvert.SerializeObject(collection);
-            dynamic a = JsonConvert.DeserializeObject(json, typeof(ExpandoObject));
-            var productsInCol = dbContext.CollectionProduct.Where(c => c.IDCollection == IDCollection);
-            List<Object> products = new List<Object>();
+            dynamic data = JsonConvert.DeserializeObject(json, typeof(ExpandoObject));
+            var productsInCol = dbContext.CollectionProduct.Where(c => c.IDCollection == IDCollection).ToList();
+            List<dynamic> products = new List<dynamic>();
             foreach (var product in productsInCol)
             {
-
-
+                var productDetail = await new ProductController(dbContext).show(product.IDProduct);
+                products.Add(productDetail);
             }
-            a.Products = products;
-
-
-            return Ok(a);
+            data.Products = products;
+            return Ok(JsonConvert.SerializeObject(data));
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> AddCollection(Collection addCollectionRequest)
+        public async Task<IActionResult> AddCollection(dynamic addCollectionRequest)
         {
-            var collection = new Collection()
+            try
             {
-                IDCollection = addCollectionRequest.IDCollection,
-                NameCollection = addCollectionRequest.NameCollection,
-                RoutePath = addCollectionRequest.RoutePath,
-                CreatedOn = addCollectionRequest.CreatedOn,
-                Description = addCollectionRequest.Description,
-                LogoImagePath = addCollectionRequest.LogoImagePath,
-                WallPaperPath = addCollectionRequest.WallPaperPath,
-                StartOn = addCollectionRequest.StartOn,
-                EndOn = addCollectionRequest.EndOn,
-                CoverImagePath = addCollectionRequest.CoverImagePath,
+                var collection = new Collection()
+                {
+                    NameCollection = addCollectionRequest.NameCollection,
+                    Description = addCollectionRequest.Description,
+                    LogoImagePath = addCollectionRequest.LogoImagePath,
+                    WallPaperPath = addCollectionRequest.WallPaperPath,
+                    StartOn = addCollectionRequest.StartOn,
+                    EndOn = addCollectionRequest.EndOn,
+                    CoverImagePath = addCollectionRequest.CoverImagePath,
+                };
+                await dbContext.Collection.AddAsync(collection);
+                await dbContext.SaveChangesAsync();
 
+                
+                if (addCollectionRequest["Products"]?.Count) 
+                //insert products into collection
+                foreach (var product in addCollectionRequest["Products"][0])
+                {
+                    var productCol = new CollectionProduct()
+                    {
+                        IDCollection = collection.IDCollection,
+                        IDProduct = product.IDProduct
+                    };
+                    await dbContext.CollectionProduct.AddAsync(productCol);
+                    await dbContext.SaveChangesAsync();
+                }
+                var json = JsonConvert.SerializeObject(collection);
+                dynamic data = JsonConvert.DeserializeObject(json, typeof(ExpandoObject));
+                data.Products = dbContext.CollectionProduct.Where(c => c.IDCollection == collection.IDCollection).ToList();
 
-            };
-            await dbContext.Collection.AddAsync(collection);
-            await dbContext.SaveChangesAsync();
-            return Ok(collection);
+                return Ok(addCollectionRequest["Products"]);
+            }
+            catch (FileNotFoundException e)
+            {
+                return BadRequest(e);
+            }
         }
 
         [HttpPut]

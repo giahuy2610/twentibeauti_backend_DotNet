@@ -8,7 +8,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
     [Route("api/")]
     public class VNPayController : Controller
     {
-        public readonly IVnPayService _vnPayService;
+        private readonly IVnPayService _vnPayService;
 
         public VNPayController(IVnPayService vnPayService)
         {
