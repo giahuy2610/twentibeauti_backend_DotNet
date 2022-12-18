@@ -11,7 +11,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
 
         public DateTime EndOn { get; set; }
         public string? Description { get; set; }
-        public bool? IsDeleted { get; set; }
+        public bool IsDeleted { get; set; }
         public int MinInvoiceValue { get; set; }
         public string CodeCoupon { get; set; }
 

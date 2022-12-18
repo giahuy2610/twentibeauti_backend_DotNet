@@ -114,6 +114,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 var invoice = new Invoice();
                 invoice.IDCus = request["IDCus"];
                 invoice.MethodPay = request["MethodPay"];
+                invoice.IDTracking = 1;
+                invoice.CreatedOn = DateTime.Now;
                 var codeCoupon = "";
                     codeCoupon = request["CodeCoupon"];
                 if (codeCoupon != null && codeCoupon != "")
@@ -132,7 +134,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 
                 foreach (var product in request["InvoiceDetail"])
                 {
-                    var productStock = dbContextInvoice.Product.Find(product["IDProduct"]).Stock;
+                    var productStock = dbContextInvoice.Product.Find((int)product["IDProduct"]).Stock;
                     if (productStock - (int)product["Quantity"] < 0) return BadRequest("Hết hàng");
                 }
 
@@ -174,12 +176,13 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 var totalValue = 0;
                 foreach (var product in request["InvoiceDetail"])
                 {
-                    var productDetail = dbContextInvoice.Product.Find(product["IDProduct"]);
-                    productDetail.Stock -= product["Quantity"];
+                    var productDetail = dbContextInvoice.Product.Find((int)product["IDProduct"]);
+                    productDetail.Stock -= (int)product["Quantity"];
                     dbContextInvoice.SaveChanges();
-                    totalValue += await new RetailPriceController(dbContextInvoice).showCurrent(product["IDProduct"]);
+                    var id = (int) product["IDProduct"];
+                    totalValue += (new RetailPriceController(dbContextInvoice).showCurrent(id))*((int)product["Quantity"]);
                 }
-
+                invoice.TotalValue = totalValue;
                 dbContextInvoice.Cart.RemoveRange(dbContextInvoice.Cart.Where(c => c.IDCus == invoice.IDCus));
                 dbContextInvoice.SaveChanges();
                 return Ok(JsonConvert.SerializeObject(invoice));
