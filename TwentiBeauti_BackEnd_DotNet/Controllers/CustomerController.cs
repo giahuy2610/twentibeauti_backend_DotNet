@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Dynamic;
 using TwentiBeauti_BackEnd_DotNet.Data;
 using TwentiBeauti_BackEnd_DotNet.Models;
 
 namespace TwentiBeauti_BackEnd_DotNet.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/customer")]
 
     public class CustomerController : ControllerBase
     {
@@ -17,25 +19,22 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             this.dbContext = dbContext;
         }
 
-        //public CustomerContext DbContext { get; set; }
 
-        [HttpGet("get")]
-        public async Task<IActionResult> GetCustomers()
-        {
-            return Ok(await dbContext.Customer.ToListAsync());
-
-        }
+        
 
         [HttpGet]
-        [Route("get/{IDCus:int}")]
-        public async Task<IActionResult> GetCustomer([FromRoute] int IDCus)
+        [Route("show/{IDCus:int}")]//done
+        public async Task<IActionResult> GetCustomer(int IDCus)
         {
             var cus = await dbContext.Customer.FindAsync(IDCus);
             if (cus == null)
             {
                 return NotFound();
             }
-            return Ok(cus);
+            var json = JsonConvert.SerializeObject(cus);
+            dynamic data = JsonConvert.DeserializeObject(json, typeof(ExpandoObject));
+            data.Phone = "0"+cus.Phone.ToString();
+            return Ok(JsonConvert.SerializeObject(data));
         }
 
         [HttpPost("create")]
@@ -52,7 +51,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             };
             await dbContext.Customer.AddAsync(cus);
             await dbContext.SaveChangesAsync();
-            return Ok(cus);
+            return Ok(JsonConvert.SerializeObject(cus));
         }
 
         [HttpPut]
@@ -71,7 +70,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 cus.IsDeleted = updateCustomerRequest.IsDeleted;
 
                 await dbContext.SaveChangesAsync();
-                return Ok(cus);
+                return Ok(JsonConvert.SerializeObject(cus));
 
             }
             return NotFound();
@@ -88,7 +87,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             {
                 dbContext.Remove(cus);
                 await dbContext.SaveChangesAsync();
-                return Ok(cus);
+                return Ok(JsonConvert.SerializeObject(cus));
 
             }
             return NotFound();

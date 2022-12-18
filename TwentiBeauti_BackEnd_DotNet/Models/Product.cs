@@ -8,8 +8,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
         public int? IDProduct { get; set; }
         public string NameProduct { get; set; }
         public int? IDBrand { get; set; }
-        public string Description { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public string? Description { get; set; }
+        public DateTime? CreatedOn { get; set; }
         public bool IsDeleted { get; set; }
         public int Stock { get; set; }
         public int TotalPurchaseQuantity { get; set; }

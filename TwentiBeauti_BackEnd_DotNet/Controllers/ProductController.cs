@@ -20,10 +20,28 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             this.dbContextProduct = dbContextProduct;
         }
 
+        [HttpGet("index")]
+        public async Task<IActionResult> index()
+        {
+            var products = await dbContextProduct.Product.ToListAsync();
+            List<dynamic> data = new List<dynamic>();
+            foreach (var product in products)
+            {
+                data.Add(await show(product.IDProduct));
+            }
+            return Ok(JsonConvert.SerializeObject(data));
+        }
 
         //done-huy
         [HttpGet("show/{IDProduct:int}")]
-        public async Task<Object> show(int IDProduct)
+        public async Task<IActionResult> showSpecified(int? IDProduct)
+        {
+            var data = await show(IDProduct);
+            return Ok(JsonConvert.SerializeObject(data));
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<Object> show(int? IDProduct)
         {
             //get product
             var product = await dbContextProduct.Product.FindAsync(IDProduct);
@@ -64,6 +82,26 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
 
 
         }
+        [HttpGet("search/{key}")]
+        public async Task<IActionResult> Search(string key)
+        {
+
+            var productsInCol = dbContextProduct.Product.Where(c => c.IsDeleted == false && c.Stock > 0 && c.NameProduct.Contains(key)).ToList();
+            List<dynamic> products = new List<dynamic>();
+            foreach (var product in productsInCol)
+            {
+                var productDetail = await new ProductController(dbContextProduct).show(product.IDProduct);
+                products.Add(productDetail);
+            }
+            return Ok(JsonConvert.SerializeObject(products));
+        }
+        
+
+        
+        
+        
+    
+    
     }
 }
     

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using TwentiBeauti_BackEnd_DotNet.Models;
 
 namespace TwentiBeauti_BackEnd_DotNet.Data
@@ -37,7 +38,6 @@ namespace TwentiBeauti_BackEnd_DotNet.Data
         public DbSet<ImageSlider> ImageSlider { get; set; }
         public DbSet<Invoice> Invoice { get; set; }
         public DbSet<InvoiceDetail> InvoiceDetail { get; set; }
-
         public DbSet<Product> Product { get; set; }
         public DbSet<ProductImage> ProductImage { get; set; }
         public DbSet<PromotionRegister> PromotionRegister { get; set; }
@@ -48,6 +48,12 @@ namespace TwentiBeauti_BackEnd_DotNet.Data
         public DbSet<TypeProduct> TypeProduct { get; set; }
 
         public DbSet<CollectionProduct> CollectionProduct { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<InvoiceDetail>().HasKey(vf => new { vf.IDProduct, vf.IDInvoice });
+            modelBuilder.Entity<CollectionProduct>().HasKey(vf => new { vf.IDProduct, vf.IDCollection });
+            modelBuilder.Entity<Cart>().HasKey(vf => new { vf.IDProduct, vf.IDCus });
+        }
 
 
 

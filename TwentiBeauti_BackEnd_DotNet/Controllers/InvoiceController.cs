@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System.ComponentModel;
+using System.Dynamic;
 using TwentiBeauti_BackEnd_DotNet.Data;
 using TwentiBeauti_BackEnd_DotNet.Models;
 
 namespace TwentiBeauti_BackEnd_DotNet.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/invoice")]
     public class InvoiceController : ControllerBase
     {
         private readonly Context dbContextInvoice;
@@ -16,14 +18,43 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         {
             this.dbContextInvoice = dbContextInvoice;
         }
-        [HttpGet("get")]
-        public async Task<IActionResult> GetInvoice()
-        {
-            return Ok(await dbContextInvoice.Invoice.ToListAsync());
 
+
+        [HttpGet("show/{IDInvoice:int?}")]//pending
+        public async Task<IActionResult> GetInvoice([FromRoute] int IDInvoice = 0)
+        {
+            if (IDInvoice == 0) 
+                return Ok(JsonConvert.SerializeObject(dbContextInvoice.Invoice.ToList()));
+
+            var invoice = dbContextInvoice.Invoice.Find(IDInvoice);
+            if (invoice == null) return NotFound();
+
+            var productsList = dbContextInvoice.InvoiceDetail.Where(c => c.IDInvoice == IDInvoice).ToList();
+
+            List<dynamic> products = new List<dynamic>();
+
+            foreach(var product in productsList)
+            {
+                products.Add(await new ProductController(dbContextInvoice).show(product.IDProduct));
+            }
+
+            var address = dbContextInvoice.Address.Find(invoice.IDAddress);
+            var coupon = dbContextInvoice.Coupon.Find(invoice.IDCoupon);
+
+            var json = JsonConvert.SerializeObject(invoice);
+            dynamic data = JsonConvert.DeserializeObject(json, typeof(ExpandoObject));
+            data.Address = address;
+            data.Coupon = coupon;
+            data.Products = products;
+            for (var i = 0; i < productsList.Count; i++)
+            {
+                data.Products[i].Quantity = productsList[i].Quantity;
+            }
+            return Ok(JsonConvert.SerializeObject(data));
         }
+
         [HttpGet]
-        [Route("get/{IDCus:int}")]
+        [Route("customer/{IDCus:int}")]//done
         public async Task<IActionResult> GetInvoiceOfCustomer([FromRoute] int IDCus)
         {
             //get list of his invoice
@@ -31,24 +62,134 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 row => row.IDCus == IDCus
                 ).ToList();
             
-            List<InvoiceInfo>? listOfInvoice = new List<InvoiceInfo> { };
+            List<dynamic>? listOfInvoice = new List<dynamic> { };
 
             foreach (var invoice in invoiceOfCus)
             {
-                var invoiceDetail = dbContextInvoice.InvoiceDetail.Where(
-                row => row.IDInvoice == invoice.IDInvoice
-                ).ToList();
-
+                var json = JsonConvert.SerializeObject(invoice);
+                dynamic data = JsonConvert.DeserializeObject(json, typeof(ExpandoObject));
                 var address = dbContextInvoice.Address.Find(invoice.IDAddress);
-
-                listOfInvoice.Add(new InvoiceInfo(invoice, address));
+                data.Address = address;
+                listOfInvoice.Add(data);
             }
-            return Ok(listOfInvoice);
+            return Ok(JsonConvert.SerializeObject(listOfInvoice));
+        }
+
+        [HttpPut("tracking-status")] //done
+        public async Task<IActionResult> changeTracking([FromBody] dynamic a)
+        {
+           var invoice = dbContextInvoice.Invoice.Find((int)a["IDInvoice"]);
+            invoice.IDTracking = a["IDTracking"];
+            dbContextInvoice.SaveChanges();
+            return Ok(invoice);
+        }
+
+        [HttpGet("vnpay-return")] // done
+        public async Task<IActionResult> PaymentCallback()
+        {
+            if (Request.Query["vnp_ResponseCode"][0] == "00")
+            {
+                //check if paid => update invoice ispaid column to true 
+                var invoice = dbContextInvoice.Invoice.Find(Request.Query["vnp_TxnRef"][0]);
+                invoice.IsPaid = true;
+                dbContextInvoice.SaveChanges();
+                return Redirect("http://localhost:3000/details/"+ Request.Query["vnp_TxnRef"][0]);
+            }
+
+            return Ok(Request.Query["vnp_ResponseCode"][0]);
+        }
+
+        [HttpGet("test")]
+        public async Task<IActionResult> test()
+        {
+            return Ok(dbContextInvoice.Product.Find(1).Stock);
         }
 
 
+        [HttpPost("create")]
+        public async Task<IActionResult> createInvoice(dynamic request)
+        {
+            try
+            {
+                var invoice = new Invoice();
+                invoice.IDCus = request["IDCus"];
+                invoice.MethodPay = request["MethodPay"];
+                var codeCoupon = "";
+                    codeCoupon = request["CodeCoupon"];
+                if (codeCoupon != null && codeCoupon != "")
+                {
+                    var coupon = dbContextInvoice.Coupon.Where(c => c.CodeCoupon == codeCoupon).FirstOrDefault();
+                    if (coupon == null) return BadRequest("Mã giảm giá không tồn tại");
+                    else if (coupon.Stock == 0 || coupon.StartOn > DateTime.Now || coupon.EndOn < DateTime.Now)
+                        return BadRequest("Not available now (out of stock, expired..etc...");
+                    else
+                    {
+                        coupon.Stock -= 1;
+                        invoice.IDCoupon = coupon.IDCoupon;
+                        invoice.TotalValue = coupon.ValueDiscount;
+                    }
+                }
+                
+                foreach (var product in request["InvoiceDetail"])
+                {
+                    var productStock = dbContextInvoice.Product.Find(product["IDProduct"]).Stock;
+                    if (productStock - (int)product["Quantity"] < 0) return BadRequest("Hết hàng");
+                }
 
+                //create address
+                var address = new Address()
+                {
+                    City = request["City"],
+                    District = request["District"],
+                    Ward = request["Ward"],
+                    AddressDetail = request["AddressDetail"],
+                    Email = request["Email"],
+                    Phone = request["Phone"],
+                    FirstName = request["FirstName"],
+                    LastName = request["LastName"],
+                };
 
+                dbContextInvoice.Address.Add(address);
+                dbContextInvoice.SaveChanges();
+
+                //create a new invoice record
+                invoice.IDAddress = address.IDAddress;
+                dbContextInvoice.Invoice.Add(invoice);
+                dbContextInvoice.SaveChanges();
+
+                //create a list of invoiceDetail
+                foreach (var product in request["InvoiceDetail"])
+                {
+                    var invoiceDetail = new InvoiceDetail()
+                    {
+                        IDInvoice = invoice.IDInvoice,
+                        IDProduct = product["IDProduct"],
+                        Quantity = product["Quantity"]
+                    };
+                    dbContextInvoice.InvoiceDetail.Add(invoiceDetail);
+                    dbContextInvoice.SaveChanges();
+                }
+
+                //minus quantity of products
+                var totalValue = 0;
+                foreach (var product in request["InvoiceDetail"])
+                {
+                    var productDetail = dbContextInvoice.Product.Find(product["IDProduct"]);
+                    productDetail.Stock -= product["Quantity"];
+                    dbContextInvoice.SaveChanges();
+                    totalValue += await new RetailPriceController(dbContextInvoice).showCurrent(product["IDProduct"]);
+                }
+
+                dbContextInvoice.Cart.RemoveRange(dbContextInvoice.Cart.Where(c => c.IDCus == invoice.IDCus));
+                dbContextInvoice.SaveChanges();
+                return Ok(JsonConvert.SerializeObject(invoice));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
+            
+        }
 
 
     }
