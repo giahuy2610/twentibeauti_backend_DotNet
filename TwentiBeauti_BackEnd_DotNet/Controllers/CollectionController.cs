@@ -20,19 +20,6 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             this.dbContext = dbContext;
         }
 
-
-        [HttpGet("test")]
-        public IActionResult GetNewtonsoftJson() =>
-            BadRequest(            new JsonResult(new
-            {
-                x = "hello",
-                y = "world"
-            }));
-
-
-
-        //public CollectionController DbContext { get; set; }
-
         [HttpGet("get")]
         public async Task<IActionResult> GetCollections()
         {
@@ -77,19 +64,21 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                     StartOn = addCollectionRequest.StartOn,
                     EndOn = addCollectionRequest.EndOn,
                     CoverImagePath = addCollectionRequest.CoverImagePath,
+                    CreatedOn = DateTime.Now
                 };
                 await dbContext.Collection.AddAsync(collection);
                 await dbContext.SaveChangesAsync();
 
                 
-                if (addCollectionRequest["Products"]?.Count) 
-                //insert products into collection
-                foreach (var product in addCollectionRequest["Products"][0])
+                if (addCollectionRequest["Products"].Count > 0) 
+
+
+                foreach (var product in addCollectionRequest["Products"])
                 {
                     var productCol = new CollectionProduct()
                     {
                         IDCollection = collection.IDCollection,
-                        IDProduct = product.IDProduct
+                        IDProduct = product
                     };
                     await dbContext.CollectionProduct.AddAsync(productCol);
                     await dbContext.SaveChangesAsync();
@@ -97,7 +86,6 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 var json = JsonConvert.SerializeObject(collection);
                 dynamic data = JsonConvert.DeserializeObject(json, typeof(ExpandoObject));
                 data.Products = dbContext.CollectionProduct.Where(c => c.IDCollection == collection.IDCollection).ToList();
-
                 return Ok(addCollectionRequest["Products"]);
             }
             catch (FileNotFoundException e)
@@ -108,26 +96,34 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
 
         [HttpPut]
         [Route("update/{IDCollection:int}")]
-        public async Task<IActionResult> UpdateCollection([FromRoute] int IDCollection, Collection updateCollectionRequest)
+        public async Task<IActionResult> UpdateCollection([FromRoute] int IDCollection, dynamic updateCollectionRequest)
         {
             var collection = await dbContext.Collection.FindAsync(IDCollection);
 
             if (collection != null)
             {
-
-
-
                 collection.NameCollection = updateCollectionRequest.NameCollection;
-
                 collection.Description = updateCollectionRequest.Description;
                 collection.LogoImagePath = updateCollectionRequest.LogoImagePath;
                 collection.WallPaperPath = updateCollectionRequest.WallPaperPath;
-
                 collection.CoverImagePath = updateCollectionRequest.CoverImagePath;
-
-
-
+                collection.StartOn = updateCollectionRequest.StartOn;
+                collection.EndOn = updateCollectionRequest.EndOn;
                 await dbContext.SaveChangesAsync();
+
+                dbContext.CollectionProduct.RemoveRange(dbContext.CollectionProduct.Where(p => p.IDCollection == IDCollection).ToList());
+                if (updateCollectionRequest["Products"].Count > 0)
+                    foreach (var product in updateCollectionRequest["Products"])
+                        {
+                            var productCol = new CollectionProduct()
+                            {
+                                IDCollection = collection.IDCollection,
+                                IDProduct = product
+                            };
+                            await dbContext.CollectionProduct.AddAsync(productCol);
+                            await dbContext.SaveChangesAsync();
+                        }
+
                 return Ok(collection);
 
             }

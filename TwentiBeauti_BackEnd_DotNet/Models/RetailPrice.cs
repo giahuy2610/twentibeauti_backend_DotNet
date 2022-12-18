@@ -9,14 +9,9 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
         public int IDProduct { get; set; }
         public int Price { get; set; }
         public int IDEvent { get; set; }
-        public DateTime? CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
         public DateTime StartOn { get; set; }
         public DateTime EndOn { get; set; }
 
-        //get all retail prices of spec product
-        public static void index(int IDProduct)
-        {
-   
-        }
     }
 }

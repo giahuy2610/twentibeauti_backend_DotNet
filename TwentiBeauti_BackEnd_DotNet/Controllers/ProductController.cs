@@ -82,6 +82,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
 
 
         }
+        
         [HttpGet("search/{key}")]
         public async Task<IActionResult> Search(string key)
         {
@@ -95,13 +96,98 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             }
             return Ok(JsonConvert.SerializeObject(products));
         }
-        
 
-        
-        
-        
-    
-    
+        [HttpPost("create")]
+        public async Task<IActionResult> Create(dynamic request)
+        {
+            try
+            {
+                var product = new Product();
+                product.NameProduct = request["NameProduct"];
+                product.IDBrand = request["IDBrand"];
+                product.Description = request["Description"];
+                product.Stock = request["Stock"];
+                product.Mass = request["Mass"];
+                product.UnitsOfMass = request["UnitsOfMass"];
+                product.Units = request["Units"];
+                product.ApplyTaxes = request["ApplyTaxes"];
+                product.StatusSale = request["StatusSale"];
+                product.ListPrice = request["ListPrice"];
+                product.IDType = request["IDType"];
+                product.IDTag = request["IDTag"];
+                product.CreatedOn = DateTime.Now;
+                dbContextProduct.Product.Add(product);
+                dbContextProduct.SaveChanges();
+
+                var products = request["Images"];
+                foreach (var path in products)
+                {
+                    var img = new ProductImage()
+                    {
+                        IDProduct = request["IDProduct"],
+                        Path = path
+                    };
+                    dbContextProduct.ProductImage.Add(img);
+                    dbContextProduct.SaveChanges();
+                }
+
+                return Ok(JsonConvert.SerializeObject(await show(product.IDProduct)));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
+
+
+
+
+        }
+
+
+        [HttpPost("update")]
+        public async Task<IActionResult> Update(dynamic request)
+        {
+            try
+            {
+                var product = dbContextProduct.Product.Find((int)request["IDProduct"]);
+                product.NameProduct = request["NameProduct"];
+                product.IDBrand = request["IDBrand"];
+                product.Description = request["Description"];
+                product.Stock = request["Stock"];
+                product.Mass = request["Mass"];
+                product.UnitsOfMass = request["UnitsOfMass"];
+                product.Units = request["Units"];
+                product.ApplyTaxes = request["ApplyTaxes"];
+                product.StatusSale = request["StatusSale"];
+                product.ListPrice = request["ListPrice"];
+                product.IDType = request["IDType"];
+                product.IDTag = request["IDTag"];
+                product.CreatedOn = product.CreatedOn;
+                dbContextProduct.SaveChanges();
+
+                var id = 0;
+                    id= request["IDProduct"];
+                dbContextProduct.ProductImage.RemoveRange(dbContextProduct.ProductImage.Where(i => i.IDProduct == id).ToList());
+
+                var products = request["Images"];
+                foreach (var path in products)
+                {
+                    var img = new ProductImage()
+                    {
+                        IDProduct = id,
+                        Path = path
+                    };
+                    dbContextProduct.ProductImage.Add(img);
+                    dbContextProduct.SaveChanges();
+                }
+
+                return Ok(JsonConvert.SerializeObject(await show(product.IDProduct)));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
+        }
     }
 }
     

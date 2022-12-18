@@ -20,6 +20,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
         public int IDTag { get; set; }
         public int IDType { get; set; }
         public int ListPrice { get; set; }
+        public bool StatusSale { get; set; }
 
         public static void getProductDetailByID(int IDProduct)
         {
