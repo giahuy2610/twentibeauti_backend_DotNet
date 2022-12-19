@@ -23,7 +23,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 OrderType = "billpayment",
                 Amount = 1000000,
                 OrderDescription = "Thanh toán đơn số 1",
-                Name = "Huy"
+                Name = "Huy",
+                Ref = "123"
             };
             var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
 
