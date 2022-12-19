@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System.Configuration;
 using System.Data;
 using TwentiBeauti_BackEnd_DotNet.Data;
+using TwentiBeauti_BackEnd_DotNet.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,9 +30,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers().AddNewtonsoftJson();
-builder.Services.AddControllers().AddJsonOptions(options => {options.JsonSerializerOptions.PropertyNamingPolicy = null;});
+builder.Services.AddControllers().AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
 builder.Services.AddControllersWithViews().AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
-
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<Context>(options => options.UseMySql(connectionString, MySqlServerVersion.LatestSupportedServerVersion));

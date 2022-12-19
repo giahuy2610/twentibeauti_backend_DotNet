@@ -19,17 +19,25 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         [HttpGet("vnpay-send")]
         public IActionResult CreatePaymentUrl()
         {
-            PaymentInformationModel model = new PaymentInformationModel() { 
+            PaymentInformationModel model = new PaymentInformationModel()
+            {
                 OrderType = "billpayment",
                 Amount = 1000000,
                 OrderDescription = "Thanh toán đơn số 1",
-                Name = "Huy"
+                Name = "Huy",
+                Ref = "123"
             };
             var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
 
             return Redirect(url);
         }
+        [HttpGet("vnpay-return")]
+        public IActionResult PaymentCallback()
+        {
+            var response = _vnPayService.PaymentExecute(Request.Query);
 
+            return Json(response);
+        }
 
     }
 }
