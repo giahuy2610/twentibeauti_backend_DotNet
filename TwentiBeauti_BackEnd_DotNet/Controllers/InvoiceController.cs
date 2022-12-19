@@ -85,24 +85,24 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         }
 
         [HttpGet("vnpay-return")] // done
-        public async Task<IActionResult> PaymentCallback()
+        public async Task<IActionResult> PaymentCallback([FromQuery]string vnp_ResponseCode, [FromQuery] int vnp_TxnRef)
         {
-            if (Request.Query["vnp_ResponseCode"][0] == "00")
+            if (vnp_ResponseCode == "00")
             {
                 //check if paid => update invoice ispaid column to true 
-                var invoice = dbContextInvoice.Invoice.Find(Request.Query["vnp_TxnRef"][0]);
+                var invoice = dbContextInvoice.Invoice.Find(vnp_TxnRef);
                 invoice.IsPaid = true;
                 dbContextInvoice.SaveChanges();
-                return Redirect("http://localhost:3000/details/"+ Request.Query["vnp_TxnRef"][0]);
+                return Redirect("http://localhost:3000/details/"+ vnp_TxnRef.ToString());
             }
-
-            return Ok(Request.Query["vnp_ResponseCode"][0]);
-        }
-
-        [HttpGet("test")]
-        public async Task<IActionResult> test()
-        {
-            return Ok(dbContextInvoice.Product.Find(1).Stock);
+            else
+            {
+                var invoice = dbContextInvoice.Invoice.Find(vnp_TxnRef);
+                invoice.IsPaid = false;
+                invoice.MethodPay = 1;
+                dbContextInvoice.SaveChanges();
+                return Redirect("http://localhost:3000/details/" + vnp_TxnRef.ToString());
+            }
         }
 
 

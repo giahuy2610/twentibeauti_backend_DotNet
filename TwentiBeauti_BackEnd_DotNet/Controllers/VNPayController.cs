@@ -16,16 +16,16 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         }
 
 
-        [HttpGet("vnpay-send")]
-        public IActionResult CreatePaymentUrl()
+        [HttpGet("test/")]
+        public IActionResult CreatePaymentUrl([FromQuery]int TotalValue, [FromQuery] int IDInvoice)
         {
             PaymentInformationModel model = new PaymentInformationModel()
             {
                 OrderType = "billpayment",
-                Amount = 1000000,
-                OrderDescription = "Thanh toán đơn số 1",
-                Name = "Huy",
-                Ref = "123"
+                Amount = TotalValue,
+                OrderDescription = "Thanh toán đơn hàng",
+                Name = "Khách hàng",
+                Ref = IDInvoice.ToString(),
             };
             var url = _vnPayService.CreatePaymentUrl(model, HttpContext);
 
