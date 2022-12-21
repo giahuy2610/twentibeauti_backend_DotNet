@@ -1,8 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Configuration;
 using System.Data;
 using TwentiBeauti_BackEnd_DotNet.Data;
+using TwentiBeauti_BackEnd_DotNet.Services;
+using TwentiBeauti_BackEnd_DotNet.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +34,19 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddControllers().AddJsonOptions(options => {options.JsonSerializerOptions.PropertyNamingPolicy = null;});
 builder.Services.AddControllersWithViews().AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
+
+
+builder.Services.AddScoped<IMailService, MailService>();
+
+
+
+//var emailConfig = Configuration
+ //       .GetSection("MailSettings")
+  //      .Get<MailSettings>();
+//builder.Services.AddSingleton(emailConfig);
+
+
+builder.Services.AddControllers();
 
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
