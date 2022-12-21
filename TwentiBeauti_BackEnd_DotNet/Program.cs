@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Configuration;
 using System.Data;
@@ -33,6 +34,19 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddControllers().AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
 builder.Services.AddControllersWithViews().AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
 builder.Services.AddScoped<IVnPayService, VnPayService>();
+
+builder.Services.AddScoped<IMailService, MailService>();
+
+
+
+//var emailConfig = Configuration
+ //       .GetSection("MailSettings")
+  //      .Get<MailSettings>();
+//builder.Services.AddSingleton(emailConfig);
+
+
+builder.Services.AddControllers();
+
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<Context>(options => options.UseMySql(connectionString, MySqlServerVersion.LatestSupportedServerVersion));
