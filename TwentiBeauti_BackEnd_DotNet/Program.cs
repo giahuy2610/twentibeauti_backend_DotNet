@@ -5,7 +5,6 @@ using System.Configuration;
 using System.Data;
 using TwentiBeauti_BackEnd_DotNet.Data;
 using TwentiBeauti_BackEnd_DotNet.Services;
-using TwentiBeauti_BackEnd_DotNet.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,9 +31,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers().AddNewtonsoftJson();
-builder.Services.AddControllers().AddJsonOptions(options => {options.JsonSerializerOptions.PropertyNamingPolicy = null;});
+builder.Services.AddControllers().AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
 builder.Services.AddControllersWithViews().AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
-
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 builder.Services.AddScoped<IMailService, MailService>();
 
