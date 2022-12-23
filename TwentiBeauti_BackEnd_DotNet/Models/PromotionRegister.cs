@@ -6,5 +6,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Models
     {
         [Key]
         public int IDRegister { get; set; }
+        public string Email { get; set; }
+        public int? IDCus { get; set; }
+        public Boolean IsDeleted { get; set; }
     }
 }
