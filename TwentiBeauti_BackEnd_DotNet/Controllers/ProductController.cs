@@ -124,7 +124,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 {
                     var img = new ProductImage()
                     {
-                        IDProduct = request["IDProduct"],
+                        IDProduct = (int) product.IDProduct,
                         Path = path
                     };
                     dbContextProduct.ProductImage.Add(img);
