@@ -35,7 +35,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
 
             foreach(var product in productsList)
             {
-                products.Add(await new ProductController(dbContextInvoice).show(product.IDProduct));
+                products.Add(await new ProductController(dbContextInvoice).showByTime(product.IDProduct, invoice.CreatedOn));
             }
 
             var address = dbContextInvoice.Address.Find(invoice.IDAddress);

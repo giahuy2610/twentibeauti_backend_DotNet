@@ -188,6 +188,32 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 return BadRequest(e);
             }
         }
+
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<Object> showByTime(int? IDProduct, DateTime timeMark)
+        {
+            //get product
+            var product = await dbContextProduct.Product.FindAsync(IDProduct);
+            var json = JsonConvert.SerializeObject(product);
+            dynamic a = JsonConvert.DeserializeObject(json, typeof(ExpandoObject));
+
+            var brand = await dbContextProduct.Brand.FindAsync(product.IDBrand);
+            a.Brand = brand;
+
+            var images = dbContextProduct.ProductImage.Where(i => i.IDProduct == IDProduct).Select(i => new { i.Path });
+            a.Images = images;
+
+            var reviews = dbContextProduct.Review.Where(i => i.IDProduct == IDProduct);
+            a.Reviews = reviews;
+            a.Rating = !reviews.Any() ? 0 : reviews.Average(r => r.Rating);
+
+            a.RetailPrice = new RetailPriceController(dbContextProduct).showByTime(IDProduct, timeMark);
+
+            return (a);
+        }
+
+
     }
 }
     

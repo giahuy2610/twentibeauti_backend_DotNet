@@ -62,7 +62,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                             IDEvent = (int)eventDetail.IDEvent,
                             Price = dbContext.Product.Find((int)product).ListPrice,
                             StartOn = request.StartOn,
-                            EndOn = request.EndOn
+                            EndOn = request.EndOn,
+                            CreatedOn = DateTime.Now
                         };
                         if (request.UnitsDiscount == 1 )
                         {
@@ -117,7 +118,8 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                             IDEvent = (int)eventDetail.IDEvent,
                             Price = dbContext.Product.Find((int)product).ListPrice,
                             StartOn = request.StartOn,
-                            EndOn = request.EndOn
+                            EndOn = request.EndOn,
+                            CreatedOn = DateTime.Now
                         };
                         if (request.UnitsDiscount == 1)
                         {
