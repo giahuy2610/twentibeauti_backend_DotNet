@@ -14,7 +14,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
         public void SendEmail(string toAddress, string subject, string content)
         {
             MailAddress to = new MailAddress(toAddress);
-            MailAddress from = new MailAddress("20520556@gm.uit.edu.vn");
+            MailAddress from = new MailAddress();
 
             MailMessage message = new MailMessage(from, to);
             message.Subject = subject;
@@ -22,7 +22,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
             message.IsBodyHtml = true;
             SmtpClient client = new SmtpClient("smtp.gmail.com", 587)
             {
-                Credentials = new NetworkCredential("20520556@gm.uit.edu.vn", "Giahuytrinh.26102002"),
+                Credentials = new NetworkCredential(),
                 EnableSsl = true
                 // specify whether your host accepts SSL connections
             };

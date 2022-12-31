@@ -185,10 +185,7 @@ namespace TwentiBeauti_BackEnd_DotNet.Controllers
                 invoice.TotalValue = totalValue;
                 dbContextInvoice.Cart.RemoveRange(dbContextInvoice.Cart.Where(c => c.IDCus == invoice.IDCus));
                 dbContextInvoice.SaveChanges();
-                if (invoice.MethodPay == 1)
-                {
-                    new EmailController().SendEmail(address.Email,"Xác nhận đơn hàng", "Cảm ơn bạn đã mua hàng tại TWENTI. Theo dõi đơn hàng tại http://192.168.1.2:3000/details/"+invoice.IDInvoice);
-                }
+                new EmailController().SendEmail(address.Email,"Xác nhận đơn hàng", "Cảm ơn bạn đã mua hàng tại TWENTI. Theo dõi đơn hàng tại http://192.168.1.2:3000/details/"+invoice.IDInvoice);
                 return Ok(JsonConvert.SerializeObject(invoice));
             }
             catch (Exception e)
